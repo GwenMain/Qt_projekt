@@ -1,0 +1,26 @@
+{
+	"BUILD_DIR" : "C:/UTB/AP7MP_Project/DatabaseGamesApp/build/Desktop_Qt_6_9_0_MinGW_64_bit-Debug/DatabaseGamesApp_autogen",
+	"CMAKE_BINARY_DIR" : "C:/UTB/AP7MP_Project/DatabaseGamesApp/build/Desktop_Qt_6_9_0_MinGW_64_bit-Debug",
+	"CMAKE_CURRENT_BINARY_DIR" : "C:/UTB/AP7MP_Project/DatabaseGamesApp/build/Desktop_Qt_6_9_0_MinGW_64_bit-Debug",
+	"CMAKE_CURRENT_SOURCE_DIR" : "C:/UTB/AP7MP_Project/DatabaseGamesApp",
+	"CMAKE_SOURCE_DIR" : "C:/UTB/AP7MP_Project/DatabaseGamesApp",
+	"CROSS_CONFIG" : false,
+	"GENERATOR" : "Ninja",
+	"INCLUDE_DIR" : "C:/UTB/AP7MP_Project/DatabaseGamesApp/build/Desktop_Qt_6_9_0_MinGW_64_bit-Debug/DatabaseGamesApp_autogen/include",
+	"INPUTS" : 
+	[
+		"C:/UTB/AP7MP_Project/DatabaseGamesApp/resources/delete.png",
+		"C:/UTB/AP7MP_Project/DatabaseGamesApp/resources/settings.png"
+	],
+	"LOCK_FILE" : "C:/UTB/AP7MP_Project/DatabaseGamesApp/build/Desktop_Qt_6_9_0_MinGW_64_bit-Debug/CMakeFiles/DatabaseGamesApp_autogen.dir/AutoRcc_resources_EWIEGA46WW_Lock.lock",
+	"MULTI_CONFIG" : false,
+	"OPTIONS" : [ "--no-zstd", "-name", "resources" ],
+	"OUTPUT_CHECKSUM" : "EWIEGA46WW",
+	"OUTPUT_NAME" : "qrc_resources.cpp",
+	"RCC_EXECUTABLE" : "C:/Qt/6.9.0/mingw_64/bin/rcc.exe",
+	"RCC_LIST_OPTIONS" : [ "--list" ],
+	"SETTINGS_FILE" : "C:/UTB/AP7MP_Project/DatabaseGamesApp/build/Desktop_Qt_6_9_0_MinGW_64_bit-Debug/CMakeFiles/DatabaseGamesApp_autogen.dir/AutoRcc_resources_EWIEGA46WW_Used.txt",
+	"SOURCE" : "C:/UTB/AP7MP_Project/DatabaseGamesApp/resources.qrc",
+	"USE_BETTER_GRAPH" : true,
+	"VERBOSITY" : 0
+}

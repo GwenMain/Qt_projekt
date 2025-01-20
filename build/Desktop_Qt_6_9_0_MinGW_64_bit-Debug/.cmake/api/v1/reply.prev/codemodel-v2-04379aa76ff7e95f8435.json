@@ -1,0 +1,79 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-.-Debug-a1db97573f20c037a51a.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.16"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "DatabaseGamesApp",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "DatabaseGamesApp::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-DatabaseGamesApp-Debug-5232dfb8c5f47393cc77.json",
+					"name" : "DatabaseGamesApp",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "DatabaseGamesApp_autogen::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-DatabaseGamesApp_autogen-Debug-4a7948e589987ad323da.json",
+					"name" : "DatabaseGamesApp_autogen",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "DatabaseGamesApp_autogen_timestamp_deps::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-DatabaseGamesApp_autogen_timestamp_deps-Debug-28eba71d8ebd2618b314.json",
+					"name" : "DatabaseGamesApp_autogen_timestamp_deps",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "C:/UTB/AP7MP_Project/DatabaseGamesApp/build/Desktop_Qt_6_9_0_MinGW_64_bit-Debug",
+		"source" : "C:/UTB/AP7MP_Project/DatabaseGamesApp"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 7
+	}
+}

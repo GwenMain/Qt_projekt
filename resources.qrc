@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>resources/delete.png</file>
+	<file>resources/settings.png</file>
+    </qresource>
+</RCC>
