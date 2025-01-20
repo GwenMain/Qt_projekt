@@ -23,8 +23,9 @@ private slots:
     void on_addGameButton_clicked();
     void on_genreComboBox_currentIndexChanged(const QString &genre);
     void on_searchTextChanged(const QString &searchText);
-    void onDeleteGameButtonClicked(const QString &gameName);
-    void onEditGameButtonClicked(const QString &gameName);
+    void onDeleteGameButtonClicked(int gameId);
+    void onEditGameButtonClicked(int gameId);
+
 
 
 private:

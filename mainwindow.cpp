@@ -50,7 +50,7 @@ void MainWindow::initializeDatabase()
     db.setDatabaseName("games.db");
 
     if (!db.open()) {
-        qDebug() << "Error opening database:" << db.lastError().text();
+        QMessageBox::critical(this, "Chyba", "Nelze otevřít databázi: " + db.lastError().text());
         return;
     }
 
@@ -61,30 +61,36 @@ void MainWindow::initializeDatabase()
                "studio TEXT, "
                "release_year INTEGER, "
                "genre TEXT, "
-               "rating INTEGER)");
+               "rating INTEGER, "
+               "image_path TEXT)");
 }
+
 
 void MainWindow::loadGames()
 {
-    QSqlQuery query("SELECT name, studio, release_year, genre, rating, image_path FROM games ORDER BY rating DESC");
+    ui->tableWidget->setSortingEnabled(false);
 
-    // Vyprázdnění tabulky
+    QSqlQuery query("SELECT id, name, studio, release_year, genre, rating, image_path FROM games ORDER BY rating DESC");
+
+    if (!query.exec()) {
+        qDebug() << "Chyba při načítání her: " << query.lastError().text();
+        return;
+    }
+
     ui->tableWidget->clearContents();
     ui->tableWidget->setRowCount(0);
 
-    // Nastavení počtu sloupců
-    ui->tableWidget->setColumnCount(7); // Přidáváme sloupec pro obrázky
-    ui->tableWidget->setHorizontalHeaderLabels({"Obrázek", "Název hry", "Studio", "Rok vydání", "Žánr", "Hodnocení", "Akce"});
 
-    // Nastavení fontu tabulky
-    ui->tableWidget->setFont(QFont("Arial", 12));
+    ui->tableWidget->setColumnCount(7); // Počet sloupců
+    ui->tableWidget->setHorizontalHeaderLabels({"Obrázek", "Název hry", "Studio", "Rok vydání", "Žánr", "Hodnocení", "Akce"});
 
     int row = 0;
     while (query.next()) {
+        qDebug() << "Načítám hru: " << query.value("name").toString();
         ui->tableWidget->insertRow(row);
 
-        // Načtení obrázku
-        QString imagePath = query.value(5).toString();
+        // Obrázek
+        QString imagePath = query.value(6).toString();
         if (!imagePath.isEmpty()) {
             QPixmap pixmap(imagePath);
             QPixmap scaledPixmap = pixmap.scaled(100, 100, Qt::KeepAspectRatio, Qt::SmoothTransformation);
@@ -93,62 +99,55 @@ void MainWindow::loadGames()
             imageLabel->setPixmap(scaledPixmap);
             imageLabel->setAlignment(Qt::AlignCenter);
             ui->tableWidget->setCellWidget(row, 0, imageLabel);
-        } else {
-            QTableWidgetItem *emptyItem = new QTableWidgetItem("");
-            emptyItem->setFlags(emptyItem->flags() & ~Qt::ItemIsEditable);
-            ui->tableWidget->setItem(row, 0, emptyItem);
         }
 
-        // Nastavení všech ostatních textových buněk jako needitovatelných
-        QStringList values = {query.value(0).toString(), // Název hry
-            query.value(1).toString(), // Studio
-            query.value(2).toString(), // Rok vydání
-            query.value(3).toString(), // Žánr
-            query.value(4).toString()  // Hodnocení
-        };
+        // Textové hodnoty
+        QStringList values = {query.value(1).toString(), query.value(2).toString(),
+                              query.value(3).toString(), query.value(4).toString(),
+                              query.value(5).toString()};
 
         for (int col = 1; col <= 5; ++col) {
             QTableWidgetItem *item = new QTableWidgetItem(values[col - 1]);
+            item->setFont(QFont("Arial", 12));
             item->setFlags(item->flags() & ~Qt::ItemIsEditable);
             ui->tableWidget->setItem(row, col, item);
         }
 
-        // Vytvoření widgetu pro tlačítka
+        // Akce (tlačítka)
+        int gameId = query.value(0).toInt();
         QWidget *buttonWidget = new QWidget();
         QHBoxLayout *layout = new QHBoxLayout(buttonWidget);
         layout->setContentsMargins(0, 0, 0, 0);
         layout->setSpacing(5);
 
-        // Tlačítko delete
         QPushButton *deleteButton = new QPushButton();
         deleteButton->setIcon(QIcon(":/resources/delete.png"));
         deleteButton->setIconSize(QSize(32, 32));
         deleteButton->setToolTip("Smazat hru");
-        connect(deleteButton, &QPushButton::clicked, [this, gameName = query.value(0).toString()]() {
-            onDeleteGameButtonClicked(gameName);
+        connect(deleteButton, &QPushButton::clicked, [this, gameId]() {
+            onDeleteGameButtonClicked(gameId);
         });
 
-        // Tlačítko upravit
         QPushButton *editButton = new QPushButton();
         editButton->setIcon(QIcon(":/resources/settings.png"));
         editButton->setIconSize(QSize(32, 32));
         editButton->setToolTip("Upravit hru");
-        connect(editButton, &QPushButton::clicked, [this, gameName = query.value(0).toString()]() {
-            onEditGameButtonClicked(gameName);
+        connect(editButton, &QPushButton::clicked, [this, gameId]() {
+            onEditGameButtonClicked(gameId);
         });
 
-        // Přidání tlačítek do layoutu
         layout->addWidget(deleteButton);
         layout->addWidget(editButton);
-
-        // Přidání widgetu do buňky
         ui->tableWidget->setCellWidget(row, 6, buttonWidget);
 
-        // Nastavení výšky řádku
         ui->tableWidget->setRowHeight(row, 100);
         ++row;
     }
+
+    ui->tableWidget->setSortingEnabled(true); // Znovu povolí řazení po načtení dat
 }
+
+
 
 
 
@@ -231,13 +230,15 @@ void MainWindow::populateGenreComboBox()
 
 void MainWindow::on_genreComboBox_currentIndexChanged(const QString &genre)
 {
+    ui->tableWidget->setSortingEnabled(false); // Zakázat řazení
+
     if (genre == "Všechny") {
         loadGames(); // Zobrazit všechny hry
         return;
     }
 
     QSqlQuery query;
-    query.prepare("SELECT name, studio, release_year, genre, rating, image_path FROM games WHERE genre = ?");
+    query.prepare("SELECT id, name, studio, release_year, genre, rating, image_path FROM games WHERE genre = ?");
     query.addBindValue(genre);
 
     if (!query.exec()) {
@@ -248,13 +249,12 @@ void MainWindow::on_genreComboBox_currentIndexChanged(const QString &genre)
     ui->tableWidget->clearContents();
     ui->tableWidget->setRowCount(0);
 
-    // Znovu načíst hry podle výsledků filtrování
     int row = 0;
     while (query.next()) {
         ui->tableWidget->insertRow(row);
 
         // Obrázek
-        QString imagePath = query.value(5).toString();
+        QString imagePath = query.value(6).toString();
         if (!imagePath.isEmpty()) {
             QPixmap pixmap(imagePath);
             QPixmap scaledPixmap = pixmap.scaled(100, 100, Qt::KeepAspectRatio, Qt::SmoothTransformation);
@@ -266,18 +266,19 @@ void MainWindow::on_genreComboBox_currentIndexChanged(const QString &genre)
         }
 
         // Textové hodnoty
-        QStringList values = {query.value(0).toString(), query.value(1).toString(),
-                              query.value(2).toString(), query.value(3).toString(),
-                              query.value(4).toString()};
+        QStringList values = {query.value(1).toString(), query.value(2).toString(),
+                              query.value(3).toString(), query.value(4).toString(),
+                              query.value(5).toString()};
 
         for (int col = 1; col <= 5; ++col) {
             QTableWidgetItem *item = new QTableWidgetItem(values[col - 1]);
-            item->setFont(QFont("Arial", 12)); // Zachování fontu
-            item->setFlags(item->flags() & ~Qt::ItemIsEditable); // Needitovatelné
+            item->setFont(QFont("Arial", 12));
+            item->setFlags(item->flags() & ~Qt::ItemIsEditable);
             ui->tableWidget->setItem(row, col, item);
         }
 
         // Akce (tlačítka)
+        int gameId = query.value(0).toInt();
         QWidget *buttonWidget = new QWidget();
         QHBoxLayout *layout = new QHBoxLayout(buttonWidget);
         layout->setContentsMargins(0, 0, 0, 0);
@@ -287,16 +288,16 @@ void MainWindow::on_genreComboBox_currentIndexChanged(const QString &genre)
         deleteButton->setIcon(QIcon(":/resources/delete.png"));
         deleteButton->setIconSize(QSize(32, 32));
         deleteButton->setToolTip("Smazat hru");
-        connect(deleteButton, &QPushButton::clicked, [this, gameName = query.value(0).toString()]() {
-            onDeleteGameButtonClicked(gameName);
+        connect(deleteButton, &QPushButton::clicked, [this, gameId]() {
+            onDeleteGameButtonClicked(gameId);
         });
 
         QPushButton *editButton = new QPushButton();
         editButton->setIcon(QIcon(":/resources/settings.png"));
         editButton->setIconSize(QSize(32, 32));
         editButton->setToolTip("Upravit hru");
-        connect(editButton, &QPushButton::clicked, [this, gameName = query.value(0).toString()]() {
-            onEditGameButtonClicked(gameName);
+        connect(editButton, &QPushButton::clicked, [this, gameId]() {
+            onEditGameButtonClicked(gameId);
         });
 
         layout->addWidget(deleteButton);
@@ -306,26 +307,32 @@ void MainWindow::on_genreComboBox_currentIndexChanged(const QString &genre)
         ui->tableWidget->setRowHeight(row, 100);
         ++row;
     }
+
+    ui->tableWidget->setSortingEnabled(true); // Povolí řazení
 }
+
 
 
 
 void MainWindow::on_searchTextChanged(const QString &searchText)
 {
+    ui->tableWidget->setSortingEnabled(false); // Zakázat řazení
+
     QString queryStr;
 
     if (searchText.trimmed().isEmpty()) {
         loadGames(); // Zobrazit všechny hry
+        ui->tableWidget->setSortingEnabled(true); // Povolí řazení
         return;
     }
 
     QString searchMode = ui->searchModeComboBox->currentText();
     if (searchMode == "Název") {
-        queryStr = "SELECT name, studio, release_year, genre, rating, image_path FROM games WHERE name LIKE ?";
+        queryStr = "SELECT id, name, studio, release_year, genre, rating, image_path FROM games WHERE name LIKE ?";
     } else if (searchMode == "Studio") {
-        queryStr = "SELECT name, studio, release_year, genre, rating, image_path FROM games WHERE studio LIKE ?";
+        queryStr = "SELECT id, name, studio, release_year, genre, rating, image_path FROM games WHERE studio LIKE ?";
     } else if (searchMode == "Rok vydání") {
-        queryStr = "SELECT name, studio, release_year, genre, rating, image_path FROM games WHERE release_year LIKE ?";
+        queryStr = "SELECT id, name, studio, release_year, genre, rating, image_path FROM games WHERE release_year LIKE ?";
     }
 
     QSqlQuery query;
@@ -334,19 +341,19 @@ void MainWindow::on_searchTextChanged(const QString &searchText)
 
     if (!query.exec()) {
         qDebug() << "Error searching games dynamically:" << query.lastError().text();
+        ui->tableWidget->setSortingEnabled(true); // Povolí řazení
         return;
     }
 
     ui->tableWidget->clearContents();
     ui->tableWidget->setRowCount(0);
 
-    // Znovu načíst hry podle výsledků vyhledávání
     int row = 0;
     while (query.next()) {
         ui->tableWidget->insertRow(row);
 
         // Obrázek
-        QString imagePath = query.value(5).toString();
+        QString imagePath = query.value(6).toString();
         if (!imagePath.isEmpty()) {
             QPixmap pixmap(imagePath);
             QPixmap scaledPixmap = pixmap.scaled(100, 100, Qt::KeepAspectRatio, Qt::SmoothTransformation);
@@ -358,18 +365,19 @@ void MainWindow::on_searchTextChanged(const QString &searchText)
         }
 
         // Textové hodnoty
-        QStringList values = {query.value(0).toString(), query.value(1).toString(),
-                              query.value(2).toString(), query.value(3).toString(),
-                              query.value(4).toString()};
+        QStringList values = {query.value(1).toString(), query.value(2).toString(),
+                              query.value(3).toString(), query.value(4).toString(),
+                              query.value(5).toString()};
 
         for (int col = 1; col <= 5; ++col) {
             QTableWidgetItem *item = new QTableWidgetItem(values[col - 1]);
-            item->setFont(QFont("Arial", 12)); // Zachování fontu
-            item->setFlags(item->flags() & ~Qt::ItemIsEditable); // Needitovatelné
+            item->setFont(QFont("Arial", 12));
+            item->setFlags(item->flags() & ~Qt::ItemIsEditable);
             ui->tableWidget->setItem(row, col, item);
         }
 
         // Akce (tlačítka)
+        int gameId = query.value(0).toInt();
         QWidget *buttonWidget = new QWidget();
         QHBoxLayout *layout = new QHBoxLayout(buttonWidget);
         layout->setContentsMargins(0, 0, 0, 0);
@@ -379,16 +387,16 @@ void MainWindow::on_searchTextChanged(const QString &searchText)
         deleteButton->setIcon(QIcon(":/resources/delete.png"));
         deleteButton->setIconSize(QSize(32, 32));
         deleteButton->setToolTip("Smazat hru");
-        connect(deleteButton, &QPushButton::clicked, [this, gameName = query.value(0).toString()]() {
-            onDeleteGameButtonClicked(gameName);
+        connect(deleteButton, &QPushButton::clicked, [this, gameId]() {
+            onDeleteGameButtonClicked(gameId);
         });
 
         QPushButton *editButton = new QPushButton();
         editButton->setIcon(QIcon(":/resources/settings.png"));
         editButton->setIconSize(QSize(32, 32));
         editButton->setToolTip("Upravit hru");
-        connect(editButton, &QPushButton::clicked, [this, gameName = query.value(0).toString()]() {
-            onEditGameButtonClicked(gameName);
+        connect(editButton, &QPushButton::clicked, [this, gameId]() {
+            onEditGameButtonClicked(gameId);
         });
 
         layout->addWidget(deleteButton);
@@ -398,36 +406,37 @@ void MainWindow::on_searchTextChanged(const QString &searchText)
         ui->tableWidget->setRowHeight(row, 100);
         ++row;
     }
+
+    ui->tableWidget->setSortingEnabled(true); // Povolí řazení
 }
 
 
 
-void MainWindow::onDeleteGameButtonClicked(const QString &gameName)
+
+
+void MainWindow::onDeleteGameButtonClicked(int gameId)
 {
-    // Potvrzení od uživatele
     QMessageBox::StandardButton reply = QMessageBox::question(this, "Smazat hru",
-                                                              "Opravdu chcete smazat hru: " + gameName + "?",
+                                                              "Opravdu chcete smazat tuto hru?",
                                                               QMessageBox::Yes | QMessageBox::No);
 
     if (reply == QMessageBox::Yes) {
-        // Smazání záznamu z databáze
         QSqlQuery query;
-        query.prepare("DELETE FROM games WHERE name = ?");
-        query.addBindValue(gameName);
+        query.prepare("DELETE FROM games WHERE id = ?");
+        query.addBindValue(gameId);
 
         if (!query.exec()) {
             qDebug() << "Chyba při mazání hry:" << query.lastError().text();
         } else {
-            // Aktualizace tabulky
             loadGames();
         }
     }
 }
 
-void MainWindow::onEditGameButtonClicked(const QString &gameName)
+void MainWindow::onEditGameButtonClicked(int gameId)
 {
-    QMessageBox::information(this, "Upravit hru", "Funkce pro úpravu hry: " + gameName);
-    // Zde implementujte logiku pro úpravu hry (například zobrazte dialog s možností upravit atributy hry).
+    QMessageBox::information(this, "Upravit hru", "Funkce pro úpravu hry s ID: " + QString::number(gameId));
+    // Implementujte dialog pro úpravu hry zde.
 }
 
 
