@@ -46,8 +46,11 @@ MainWindow::~MainWindow()
 
 void MainWindow::initializeDatabase()
 {
+    // Cesta k databázi mimo složku build
+    QString databasePath = QCoreApplication::applicationDirPath() + "/../../games.db";
+
     db = QSqlDatabase::addDatabase("QSQLITE");
-    db.setDatabaseName("games.db");
+    db.setDatabaseName(databasePath);
 
     if (!db.open()) {
         QMessageBox::critical(this, "Chyba", "Nelze otevřít databázi: " + db.lastError().text());
@@ -63,7 +66,15 @@ void MainWindow::initializeDatabase()
                "genre TEXT, "
                "rating INTEGER, "
                "image_path TEXT)");
+    qDebug() << "Cesta k databázi:" << databasePath;
+
+
 }
+
+
+
+
+
 
 
 void MainWindow::loadGames()
