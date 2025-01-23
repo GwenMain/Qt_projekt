@@ -377,4 +377,5 @@ C:/UTB/AP7MP_Project/DatabaseGamesApp/build/Desktop_Qt_6_9_0_MinGW_64_bit-Debug/
   C:/Qt/Tools/mingw1310_64/x86_64-w64-mingw32/include/time.h \
   C:/Qt/Tools/mingw1310_64/x86_64-w64-mingw32/include/vadefs.h \
   C:/Qt/Tools/mingw1310_64/x86_64-w64-mingw32/include/wchar.h \
-  C:/UTB/AP7MP_Project/DatabaseGamesApp/addgamedialog.h
+  C:/UTB/AP7MP_Project/DatabaseGamesApp/addgamedialog.h \
+  C:/UTB/AP7MP_Project/DatabaseGamesApp/editgamedialog.h

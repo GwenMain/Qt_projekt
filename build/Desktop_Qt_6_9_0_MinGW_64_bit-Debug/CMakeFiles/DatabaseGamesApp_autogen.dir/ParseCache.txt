@@ -752,6 +752,7 @@ C:/UTB/AP7MP_Project/DatabaseGamesApp/mainwindow.h
  mdp:C:/Qt/Tools/mingw1310_64/x86_64-w64-mingw32/include/wchar.h
  mdp:C:/UTB/AP7MP_Project/DatabaseGamesApp/AddGameDialog.h
  mdp:C:/UTB/AP7MP_Project/DatabaseGamesApp/build/Desktop_Qt_6_9_0_MinGW_64_bit-Debug/DatabaseGamesApp_autogen/moc_predefs.h
+ mdp:C:/UTB/AP7MP_Project/DatabaseGamesApp/editgamedialog.h
  mdp:C:/UTB/AP7MP_Project/DatabaseGamesApp/mainwindow.h
 C:/UTB/AP7MP_Project/DatabaseGamesApp/ImagePickerDialog.cpp
 C:/UTB/AP7MP_Project/DatabaseGamesApp/main.cpp

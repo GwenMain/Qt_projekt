@@ -140,11 +140,11 @@ public:
 
     void retranslateUi(QMainWindow *MainWindow)
     {
-        MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "MainWindow", nullptr));
+        MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "Datab\303\241ze her", nullptr));
         label->setText(QCoreApplication::translate("MainWindow", "Hledat", nullptr));
         searchModeLabel->setText(QCoreApplication::translate("MainWindow", "Vyhled\303\241vat dle:", nullptr));
         genreLabel->setText(QCoreApplication::translate("MainWindow", "\305\275\303\241nr:", nullptr));
-        addGameButton->setText(QCoreApplication::translate("MainWindow", "PushButton", nullptr));
+        addGameButton->setText(QCoreApplication::translate("MainWindow", "P\305\231idat novou hru", nullptr));
     } // retranslateUi
 
 };

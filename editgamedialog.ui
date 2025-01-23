@@ -194,11 +194,22 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="editBrowseButton">
-         <property name="text">
-          <string>Procházet...</string>
-         </property>
-        </widget>
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <item>
+          <widget class="QPushButton" name="editBrowseButton">
+           <property name="text">
+            <string>Procházet...</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="clearImageButton">
+           <property name="text">
+            <string>Zrušit cestu</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
        <item>
         <widget class="QDialogButtonBox" name="editButtonBox">

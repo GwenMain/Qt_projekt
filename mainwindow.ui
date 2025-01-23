@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Databáze her</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
@@ -79,7 +79,7 @@
       <item>
        <widget class="QPushButton" name="addGameButton">
         <property name="text">
-         <string>PushButton</string>
+         <string>Přidat novou hru</string>
         </property>
        </widget>
       </item>

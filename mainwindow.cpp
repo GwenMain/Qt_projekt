@@ -165,7 +165,7 @@ void MainWindow::addGame(const QString &name, const QString &studio, int year, c
     query.addBindValue(year);
     query.addBindValue(genre);
     query.addBindValue(rating);
-    query.addBindValue(imagePath.isEmpty() ? QVariant(QVariant::String) : imagePath);
+    query.addBindValue(imagePath.isEmpty() ? QVariant::fromValue(QString()) : imagePath);
 
     if (!query.exec()) {
         qDebug() << "Error inserting game:" << query.lastError().text();
@@ -435,10 +435,55 @@ void MainWindow::onDeleteGameButtonClicked(int gameId)
 
 void MainWindow::onEditGameButtonClicked(int gameId)
 {
-    QMessageBox::information(this, "Upravit hru", "Funkce pro úpravu hry s ID: " + QString::number(gameId));
-    // Implementujte dialog pro úpravu hry zde.
-}
+    QSqlQuery query;
+    query.prepare("SELECT name, studio, release_year, genre, rating, image_path FROM games WHERE id = ?");
+    query.addBindValue(gameId);
 
+    if (!query.exec() || !query.next()) {
+        QMessageBox::warning(this, "Chyba", "Nelze načíst data hry.");
+        return;
+    }
+
+    // Získání dat z databáze
+    QString name = query.value(0).toString();
+    QString studio = query.value(1).toString();
+    int year = query.value(2).toInt();
+    QString genre = query.value(3).toString();
+    int rating = query.value(4).toInt();
+    QString imagePath = query.value(5).toString();
+
+    // Otevření dialogu pro úpravu
+    EditGameDialog dialog(this);
+    dialog.setGameData(name, studio, year, genre, rating, imagePath);
+
+    if (dialog.exec() == QDialog::Accepted) {
+        // Získání aktualizovaných hodnot
+        QString updatedName = dialog.getName();
+        QString updatedStudio = dialog.getStudio();
+        int updatedYear = dialog.getYear();
+        QString updatedGenre = dialog.getGenre();
+        int updatedRating = dialog.getRating();
+        QString updatedImagePath = dialog.getImagePath();
+
+        // Aktualizace v databázi
+        QSqlQuery updateQuery;
+        updateQuery.prepare("UPDATE games SET name = ?, studio = ?, release_year = ?, genre = ?, rating = ?, image_path = ? WHERE id = ?");
+        updateQuery.addBindValue(updatedName);
+        updateQuery.addBindValue(updatedStudio);
+        updateQuery.addBindValue(updatedYear);
+        updateQuery.addBindValue(updatedGenre);
+        updateQuery.addBindValue(updatedRating);
+        updateQuery.addBindValue(updatedImagePath.isEmpty() ? QVariant::fromValue(QString()) : updatedImagePath);
+        updateQuery.addBindValue(gameId);
+
+        if (!updateQuery.exec()) {
+            QMessageBox::warning(this, "Chyba", "Aktualizace hry selhala: " + updateQuery.lastError().text());
+        } else {
+            loadGames();
+            QMessageBox::information(this, "Hotovo", "Hra byla úspěšně aktualizována.");
+        }
+    }
+}
 
 
 

@@ -8,16 +8,15 @@ EditGameDialog::EditGameDialog(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    // Nastavení rozsahu a výchozích hodnot
-    ui->editYearSpinBox->setRange(1980, 2030);
-    ui->editRatingSpinBox->setRange(1, 5);
-
-    // Přidání pevně definovaných žánrů
-    ui->editGenreComboBox->addItems({"RPG", "FPS", "Strategy", "Adventure", "Simulation", "Sports", "Puzzle", "Horror"});
-
     // Připojení tlačítek OK a Cancel
-    connect(ui->editButtonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
-    connect(ui->editButtonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
+    connect(ui->editButtonBox, &QDialogButtonBox::accepted, this, &EditGameDialog::accept);
+    connect(ui->editButtonBox, &QDialogButtonBox::rejected, this, &EditGameDialog::reject);
+
+    // Naplnění ComboBoxu pro žánr
+    ui->editGenreComboBox->addItems({
+        "RPG", "FPS", "Strategy", "Adventure", "Simulation",
+        "Sports", "Puzzle", "Horror"
+    });
 }
 
 EditGameDialog::~EditGameDialog()
@@ -33,7 +32,6 @@ void EditGameDialog::setGameData(const QString &name, const QString &studio, int
     ui->editGenreComboBox->setCurrentText(genre);
     ui->editRatingSpinBox->setValue(rating);
     ui->editImageLineEdit->setText(imagePath);
-    this->imagePath = imagePath;
 }
 
 QString EditGameDialog::getName() const
@@ -56,21 +54,25 @@ QString EditGameDialog::getGenre() const
     return ui->editGenreComboBox->currentText();
 }
 
-QString EditGameDialog::getImagePath() const
-{
-    return imagePath;
-}
-
 int EditGameDialog::getRating() const
 {
     return ui->editRatingSpinBox->value();
 }
 
+QString EditGameDialog::getImagePath() const
+{
+    return ui->editImageLineEdit->text();
+}
+
 void EditGameDialog::on_editBrowseButton_clicked()
 {
-    QString file = QFileDialog::getOpenFileName(this, "Vyberte obrázek hry", "", "Obrázky (*.png *.jpg *.jpeg *.bmp)");
-    if (!file.isEmpty()) {
-        imagePath = file;
-        ui->editImageLineEdit->setText(file);
+    QString filePath = QFileDialog::getOpenFileName(this, "Vyberte obrázek", QString(), "Images (*.png *.xpm *.jpg *.jpeg)");
+    if (!filePath.isEmpty()) {
+        ui->editImageLineEdit->setText(filePath);
     }
+}
+
+void EditGameDialog::on_clearImageButton_clicked()
+{
+    ui->editImageLineEdit->clear(); // Vymaže text v poli
 }

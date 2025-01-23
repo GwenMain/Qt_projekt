@@ -51,7 +51,9 @@ public:
     QSpacerItem *verticalSpacer_6;
     QLabel *label_14;
     QLineEdit *editImageLineEdit;
+    QHBoxLayout *horizontalLayout;
     QPushButton *editBrowseButton;
+    QPushButton *clearImageButton;
     QDialogButtonBox *editButtonBox;
 
     void setupUi(QDialog *EditGameDialog)
@@ -176,10 +178,20 @@ public:
 
         verticalLayout_4->addWidget(editImageLineEdit);
 
+        horizontalLayout = new QHBoxLayout();
+        horizontalLayout->setObjectName("horizontalLayout");
         editBrowseButton = new QPushButton(EditGameDialog);
         editBrowseButton->setObjectName("editBrowseButton");
 
-        verticalLayout_4->addWidget(editBrowseButton);
+        horizontalLayout->addWidget(editBrowseButton);
+
+        clearImageButton = new QPushButton(EditGameDialog);
+        clearImageButton->setObjectName("clearImageButton");
+
+        horizontalLayout->addWidget(clearImageButton);
+
+
+        verticalLayout_4->addLayout(horizontalLayout);
 
         editButtonBox = new QDialogButtonBox(EditGameDialog);
         editButtonBox->setObjectName("editButtonBox");
@@ -211,6 +223,7 @@ public:
         label_14->setText(QCoreApplication::translate("EditGameDialog", "Obr\303\241zek / ikonka hry (nepovinn\303\251)", nullptr));
         editImageLineEdit->setText(QCoreApplication::translate("EditGameDialog", "Cesta k obr\303\241zku", nullptr));
         editBrowseButton->setText(QCoreApplication::translate("EditGameDialog", "Proch\303\241zet...", nullptr));
+        clearImageButton->setText(QCoreApplication::translate("EditGameDialog", "Zru\305\241it cestu", nullptr));
     } // retranslateUi
 
 };

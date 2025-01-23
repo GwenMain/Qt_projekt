@@ -3,6 +3,8 @@
 
 #include <QDialog>
 
+
+
 namespace Ui {
 class EditGameDialog;
 }
@@ -20,15 +22,15 @@ public:
     QString getStudio() const;
     int getYear() const;
     QString getGenre() const;
-    QString getImagePath() const;
     int getRating() const;
+    QString getImagePath() const;
 
 private slots:
     void on_editBrowseButton_clicked();
+    void on_clearImageButton_clicked();
 
 private:
     Ui::EditGameDialog *ui;
-    QString imagePath;
 };
 
 #endif // EDITGAMEDIALOG_H
