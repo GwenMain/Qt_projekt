@@ -44,9 +44,8 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::initializeDatabase()
-{
-    // Cesta k databázi mimo složku build
+void MainWindow::initializeDatabase() {
+    // Původní kód pro inicializaci databáze
     QString databasePath = QCoreApplication::applicationDirPath() + "/../../games.db";
 
     db = QSqlDatabase::addDatabase("QSQLITE");
@@ -66,10 +65,14 @@ void MainWindow::initializeDatabase()
                "genre TEXT, "
                "rating INTEGER, "
                "image_path TEXT)");
+
+    // Přidání inicializace složky `images`
+    QString imageFolderPath = QCoreApplication::applicationDirPath() + "/images";
+    QDir().mkpath(imageFolderPath); // Vytvoří složku pro obrázky, pokud neexistuje
+
     qDebug() << "Cesta k databázi:" << databasePath;
-
-
 }
+
 
 
 
@@ -433,16 +436,38 @@ void MainWindow::onDeleteGameButtonClicked(int gameId)
 
     if (reply == QMessageBox::Yes) {
         QSqlQuery query;
+
+        // Načtení cesty k obrázku před smazáním záznamu
+        query.prepare("SELECT image_path FROM games WHERE id = ?");
+        query.addBindValue(gameId);
+
+        if (!query.exec() || !query.next()) {
+            QMessageBox::warning(this, "Chyba", "Nepodařilo se načíst cestu k obrázku.");
+            return;
+        }
+
+        QString imagePath = query.value(0).toString(); // Cesta k obrázku
+
+        // Smazání záznamu z databáze
         query.prepare("DELETE FROM games WHERE id = ?");
         query.addBindValue(gameId);
 
         if (!query.exec()) {
-            qDebug() << "Chyba při mazání hry:" << query.lastError().text();
+            QMessageBox::warning(this, "Chyba", "Smazání hry selhalo: " + query.lastError().text());
         } else {
-            loadGames();
+            // Smazání obrázku
+            if (!imagePath.isEmpty() && QFile::exists(imagePath)) {
+                if (!QFile::remove(imagePath)) {
+                    qDebug() << "Chyba při mazání obrázku:" << imagePath;
+                }
+            }
+
+            loadGames(); // Načtení aktualizovaných dat do tabulky
+            QMessageBox::information(this, "Hotovo", "Hra byla úspěšně smazána.");
         }
     }
 }
+
 
 void MainWindow::onEditGameButtonClicked(int gameId)
 {
@@ -461,11 +486,11 @@ void MainWindow::onEditGameButtonClicked(int gameId)
     int year = query.value(2).toInt();
     QString genre = query.value(3).toString();
     int rating = query.value(4).toInt();
-    QString imagePath = query.value(5).toString();
+    QString originalImagePath = query.value(5).toString(); // Původní obrázek
 
     // Otevření dialogu pro úpravu
     EditGameDialog dialog(this);
-    dialog.setGameData(name, studio, year, genre, rating, imagePath);
+    dialog.setGameData(name, studio, year, genre, rating, originalImagePath);
 
     if (dialog.exec() == QDialog::Accepted) {
         // Získání aktualizovaných hodnot
@@ -474,7 +499,14 @@ void MainWindow::onEditGameButtonClicked(int gameId)
         int updatedYear = dialog.getYear();
         QString updatedGenre = dialog.getGenre();
         int updatedRating = dialog.getRating();
-        QString updatedImagePath = dialog.getImagePath();
+        QString updatedImagePath = dialog.getImagePath(); // Nový obrázek
+
+        // Pokud je obrázek změněn, smažte původní
+        if (!originalImagePath.isEmpty() && originalImagePath != updatedImagePath && QFile::exists(originalImagePath)) {
+            if (!QFile::remove(originalImagePath)) {
+                qDebug() << "Chyba při mazání původního obrázku:" << originalImagePath;
+            }
+        }
 
         // Aktualizace v databázi
         QSqlQuery updateQuery;
@@ -495,6 +527,8 @@ void MainWindow::onEditGameButtonClicked(int gameId)
         }
     }
 }
+
+
 
 
 

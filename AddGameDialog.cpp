@@ -2,6 +2,9 @@
 #include "ui_addgamedialog.h"
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QFileDialog>
+#include "utils.h"
+
 
 AddGameDialog::AddGameDialog(QWidget *parent) :
     QDialog(parent),
@@ -46,21 +49,27 @@ QString AddGameDialog::getGenre() const
     return ui->genreComboBox->currentText();
 }
 
-QString AddGameDialog::getImagePath() const
-{
-    return imagePath;
+
+QString AddGameDialog::getImagePath() const {
+    if (!imagePath.isEmpty()) {
+        QString copiedPath = copyImageToAppFolder(imagePath); // Zkopíruje obrázek
+        return copiedPath;
+    }
+    return "";
 }
+
 
 int AddGameDialog::getRating() const
 {
     return ui->ratingSpinBox->value();
 }
 
-void AddGameDialog::on_browseButton_clicked()
-{
+void AddGameDialog::on_browseButton_clicked() {
     QString file = QFileDialog::getOpenFileName(this, "Vyberte obrázek hry", "", "Obrázky (*.png *.jpg *.jpeg *.bmp)");
     if (!file.isEmpty()) {
-        imagePath = file;
-        ui->imageLineEdit->setText(file); // Nastavení cesty do pole
+        imagePath = file; // Uloží pouze původní cestu
+        ui->imageLineEdit->setText(file); // Zobrazí cestu v uživatelském rozhraní
     }
 }
+
+

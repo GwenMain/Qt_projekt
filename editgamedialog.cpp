@@ -1,6 +1,14 @@
 #include "editgamedialog.h"
 #include "ui_editgamedialog.h"
 #include <QFileDialog>
+#include <QFile>
+#include <QDir>
+#include <QUuid>
+#include <QFileInfo>
+#include <QDebug>
+#include <QMessageBox>
+#include "utils.h"
+
 
 EditGameDialog::EditGameDialog(QWidget *parent) :
     QDialog(parent),
@@ -32,7 +40,10 @@ void EditGameDialog::setGameData(const QString &name, const QString &studio, int
     ui->editGenreComboBox->setCurrentText(genre);
     ui->editRatingSpinBox->setValue(rating);
     ui->editImageLineEdit->setText(imagePath);
+
+    originalImagePath = imagePath; // Uložení původní cesty obrázku
 }
+
 
 QString EditGameDialog::getName() const
 {
@@ -61,18 +72,34 @@ int EditGameDialog::getRating() const
 
 QString EditGameDialog::getImagePath() const
 {
-    return ui->editImageLineEdit->text();
+    QString currentImagePath = ui->editImageLineEdit->text();
+
+    // Pokud je cesta nová (není shodná s původní), zkopírujte obrázek
+    if (!currentImagePath.isEmpty() && currentImagePath != originalImagePath) {
+        QString copiedPath = copyImageToAppFolder(currentImagePath); // Zkopíruje obrázek do složky aplikace
+        return copiedPath; // Vrátí novou cestu
+    }
+
+    // Pokud je cesta prázdná, znamená to, že byl obrázek odstraněn
+    if (currentImagePath.isEmpty()) {
+        return ""; // Vrátí prázdnou cestu
+    }
+
+    // Pokud se cesta nezměnila, vrátí původní cestu
+    return originalImagePath;
 }
 
 void EditGameDialog::on_editBrowseButton_clicked()
 {
-    QString filePath = QFileDialog::getOpenFileName(this, "Vyberte obrázek", QString(), "Images (*.png *.xpm *.jpg *.jpeg)");
+    QString filePath = QFileDialog::getOpenFileName(this, "Vyberte obrázek", QString(), "Images (*.png *.jpg *.jpeg *.bmp)");
     if (!filePath.isEmpty()) {
-        ui->editImageLineEdit->setText(filePath);
+        ui->editImageLineEdit->setText(filePath); // Zobrazí cestu v uživatelském rozhraní
     }
 }
 
+
 void EditGameDialog::on_clearImageButton_clicked()
 {
-    ui->editImageLineEdit->clear(); // Vymaže text v poli
+    ui->editImageLineEdit->clear(); // Vyprázdnění pole cesty
 }
+

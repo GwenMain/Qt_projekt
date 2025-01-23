@@ -28,6 +28,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         ImagePickerDialog.cpp
         addgamedialog.h addgamedialog.cpp addgamedialog.ui
         editgamedialog.h editgamedialog.cpp editgamedialog.ui
+        utils.h
+        utils.cpp
 
 
     )

@@ -2,6 +2,7 @@
 #define EDITGAMEDIALOG_H
 
 #include <QDialog>
+#include <QString>
 
 
 
@@ -29,8 +30,10 @@ private slots:
     void on_editBrowseButton_clicked();
     void on_clearImageButton_clicked();
 
+
 private:
     Ui::EditGameDialog *ui;
+    QString originalImagePath;
 };
 
 #endif // EDITGAMEDIALOG_H
